@@ -1,0 +1,38 @@
+{
+  "name": "cesium-webpack-example",
+  "version": "1.0.0",
+  "description": "The minimal recomended setup for an app using Cesium with Webpack.",
+  "main": "index.js",
+  "keywords": [
+    "cesium",
+    "webpack",
+    "example"
+  ],
+  "author": {
+    "name": "Cesium GS, Inc.",
+    "url": "https://cesium.com"
+  },
+  "homepage": "https://cesiumjs.org",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "cesium": "^1.63.1"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
+    "css-loader": "^3.2.0",
+    "html-webpack-plugin": "^3.2.0",
+    "strip-pragma-loader": "^1.0.0",
+    "style-loader": "^1.0.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "url-loader": "^2.2.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.9.0"
+  },
+  "scripts": {
+    "build": "node_modules/.bin/webpack --config webpack.config.js",
+    "start": "node_modules/.bin/webpack-dev-server --config webpack.config.js",
+    "release": "node_modules/.bin/webpack --config webpack.release.config.js",
+    "serve-release": "node_modules/.bin/webpack-dev-server --config webpack.release.config.js --content-base /dist"
+  }
+}
