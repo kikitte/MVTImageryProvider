@@ -1,0 +1,24 @@
+{
+  "name": "mvt-imagery-provider",
+  "version": "1.0.0",
+  "description": "A Mapbox style renderer for CesiumJS",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kikitte/MVTImageryProvider.git"
+  },
+  "keywords": [
+    "'Mapbox Style",
+    "Vector Tile",
+    "Cesium"
+  ],
+  "author": "kikitte",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kikitte/MVTImageryProvider/issues"
+  },
+  "homepage": "https://github.com/kikitte/MVTImageryProvider#readme"
+}
