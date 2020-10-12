@@ -1,10 +1,13 @@
-import { Viewer } from "cesium";
+import { Viewer, GridImageryProvider, Ion } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
-import MVTImageryProvider from "./MVTImageryProvider";
+import MVTImageryProvider from "../src/MVTImageryProvider";
+
+Ion.defaultServer = ""
 
 var cesiumViewer = new Viewer("cesiumContainer", {
   terrainProvider: undefined,
+  imageryProvider: new GridImageryProvider()
 });
 
 var style = {
