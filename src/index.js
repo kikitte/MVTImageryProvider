@@ -4,6 +4,7 @@ import * as Cesium from "cesium";
 class MVTImageryProvider {
   /**
    *
+   * @param {Object} options
    * @param {Object} options.style - mapbox style object
    * @param {Object} options.cesiumViewer - Cesium Viewer instance
    * @param {Function} [options.sourceFilter] - sourceFilter is used to filter which source participate in pickFeature process.

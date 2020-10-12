@@ -1,4 +1,4 @@
-在CesiumJS中提供矢量瓦片渲染，支持Mapbox Style Specification. 项目很简单，复杂的渲染工作由mapbox-gl-js完成，详情请见[https://github.com/landtechnologies/Mapbox-vector-tiles-basic-js-renderer].
+在CesiumJS中提供矢量瓦片渲染，支持Mapbox Style Specification. 项目很简单，复杂的渲染工作由mapbox-gl-js完成，详情请见[Mapbox-vector-tiles-basic-js-renderer](https://github.com/landtechnologies/Mapbox-vector-tiles-basic-js-renderer).
 
 ### 如何使用
 

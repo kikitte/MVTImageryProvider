@@ -1,4 +1,4 @@
-Render Mapbox style in CesiumJs. This project is very simple, because the complex rendering task is compeleted by mapbox-gl-js, you should also check (Mapbox-vector-tiles-basic-js-renderer)[https://github.com/landtechnologies/Mapbox-vector-tiles-basic-js-renderer] for more detail.
+Render Mapbox style in CesiumJs. This project is very simple, because the complex rendering task is compeleted by mapbox-gl-js, you should also check [Mapbox-vector-tiles-basic-js-renderer](https://github.com/landtechnologies/Mapbox-vector-tiles-basic-js-renderer) for more detail.
 
 [中文README](README-zh.md)
 
