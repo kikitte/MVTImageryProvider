@@ -27,6 +27,14 @@ npm i
 npm start
 ```
 
+### 截图
+
+![Screenshot_20201012_172140](screenshots/Screenshot_20201012_172140.png)
+
+![Screenshot_20201012_172222](screenshots/Screenshot_20201012_172222.png)
+
+
+
 ### 已知问题
 1. 不支持类型为background, raster的图层。
   
