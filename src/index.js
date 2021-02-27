@@ -6,7 +6,6 @@ class MVTImageryProvider {
    *
    * @param {Object} options
    * @param {Object} options.style - mapbox style object
-   * @param {Object} options.cesiumViewer - Cesium Viewer instance
    * @param {Function} [options.sourceFilter] - sourceFilter is used to filter which source participate in pickFeature process.
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
@@ -32,7 +31,6 @@ class MVTImageryProvider {
     this.proxy = new Cesium.DefaultProxy("");
     this.hasAlphaChannel =
       options.hasAlphaChannel !== undefined ? options.hasAlphaChannel : true;
-    this.cesiumviewer = options.cesiumViewer;
     this.sourceFilter = options.sourceFilter;
   }
 
