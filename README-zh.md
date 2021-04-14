@@ -8,7 +8,6 @@
    ```javascript
    let options = {
      style: Object // 样式对象，必选．
-     cesiumViewer: Cesium.Viewer // Cesium Viewer实例，必选．
    }
    let provider = new ImageryProvider(options)
    ```

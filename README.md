@@ -10,7 +10,6 @@ Clone the project and then place the file in src to appropriate folder.
    ```javascript
    let options = {
      style: Object // Mapbox Style Object, required.
-     cesiumViewer: Cesium.Viewer // Cesium Viewer Instance, required.
    }
    let provider = new ImageryProvider(options)
    ```

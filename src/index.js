@@ -9,7 +9,7 @@ class MVTImageryProvider {
    * @param {Function} [options.sourceFilter] - sourceFilter is used to filter which source participate in pickFeature process.
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
-   * @param {Number} [options.tileSize] - can be 256 or 512.
+   * @param {Number} [options.tileSize=512] - can be 256 or 512.
    * @param {Boolean} [options.hasAlphaChannel] -
    * @param {String} [options.credit] -
    *
