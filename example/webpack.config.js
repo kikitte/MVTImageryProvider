@@ -49,9 +49,11 @@ module.exports = [{
             CESIUM_BASE_URL: JSON.stringify('')
         })
     ],
-
-    // development server options
     devServer: {
-        contentBase: path.join(__dirname, "dist")
+        client: {
+            overlay: {
+                warnings: false,
+            }
+      },
     }
 }];
