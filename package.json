@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/kikitte/MVTImageryProvider/issues"
   },
-  "homepage": "https://github.com/kikitte/MVTImageryProvider#readme"
+  "homepage": "https://github.com/kikitte/MVTImageryProvider#readme",
+  "peerDependencies": {
+    "cesium": "*"
+  }
 }
