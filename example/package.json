@@ -15,7 +15,8 @@
   "homepage": "https://cesiumjs.org",
   "license": "Apache-2.0",
   "dependencies": {
-    "cesium": "^1.63.1"
+    "cesium": "^1.63.1",
+    "cesium-mvtimageryprovider": "file:../"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.4",
@@ -30,9 +31,6 @@
     "webpack-dev-server": "^3.9.0"
   },
   "scripts": {
-    "build": "node_modules/.bin/webpack --config webpack.config.js",
-    "start": "node_modules/.bin/webpack-dev-server --config webpack.config.js",
-    "release": "node_modules/.bin/webpack --config webpack.release.config.js",
-    "serve-release": "node_modules/.bin/webpack-dev-server --config webpack.release.config.js --content-base /dist"
+    "start": "node_modules/.bin/webpack-dev-server --open --config webpack.config.js"
   }
 }
