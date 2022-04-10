@@ -134,6 +134,12 @@ class MVTImageryProvider {
       return queryResult;
     });
   }
+
+  destroy() {
+    this.mapboxRenderer._cancelAllPendingRenders();
+    Object.values(this.mapboxRenderer._style.sourceCaches).forEach(cache => cache._tileCache.reset());
+    this.mapboxRenderer._gl.getExtension('WEBGL_lose_context').loseContext();
+  }
 }
 
 export default MVTImageryProvider;
