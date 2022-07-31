@@ -98,7 +98,7 @@ class MVTImageryProvider {
           destTop: 0,
         },
         tilesSpec,
-        async (err) => {
+        (err) => {
           if (!!err) {
             switch (err) {
               case "canceled": case "fully-canceled":
