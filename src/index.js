@@ -99,14 +99,13 @@ class MVTImageryProvider {
         },
         tilesSpec,
         (err) => {
-          if (!!err) {
-            switch (err) {
-              case "canceled": case "fully-canceled":
-                reject(undefined);
-                return;
-            }
-          }
-          if (releaseTile) {
+          /**
+           * In case of err ends with 'tiles not available', the canvas will still be painted.
+           * relate url: https://github.com/landtechnologies/Mapbox-vector-tiles-basic-js-renderer/blob/master/src/basic/renderer.js#L341-L405
+           */
+          if (typeof err === 'string' && !err.endsWith('tiles not available')) {
+            reject(undefined);
+          } else if (releaseTile) {
             renderRef.consumer.ctx = undefined;
             resolve(canv);
             // releaseTile默认为true，对应Cesium请求图像的情形
