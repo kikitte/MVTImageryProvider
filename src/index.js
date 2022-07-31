@@ -47,28 +47,48 @@ class MVTImageryProvider {
     return canv;
   }
 
+  _getTilesSpec(coord, source) {
+    const { x, y, zoom } = coord
+    const TILE_SIZE = this.tileSize
+    // 3x3 grid of source tiles, where the region of interest is that corresponding to the central source tile
+    let ret = [];
+    const maxTile = (1 << zoom) - 1
+    for (let xx = -1; xx <= 1; xx++) {
+      let newx = x + xx
+      if (newx < 0) newx = maxTile
+      if (newx > maxTile) newx = 0
+      for (let yy = -1; yy <= 1; yy++) {
+        let newy = y + yy
+        if (newy < 0) continue
+        if (newy > maxTile) continue
+        ret.push({
+          source: source,
+          z: zoom,
+          x: newx,
+          y: newy,
+          left: 0 + xx * TILE_SIZE,
+          top: 0 + yy * TILE_SIZE,
+          size: TILE_SIZE
+        });
+      }
+    }
+    return ret
+  }
+
   requestImage(x, y, zoom, releaseTile = true) {
     if (zoom > this.maximumLevel || zoom < this.minimumLevel)
       return Promise.reject(undefined);
 
     this.mapboxRenderer.filterForZoom(zoom);
-    const tilesSpec = [];
-    this.mapboxRenderer.getVisibleSources().forEach((s) => {
-      tilesSpec.push({
-        source: s,
-        z: zoom,
-        x: x,
-        y: y,
-        left: 0,
-        top: 0,
-        size: this.tileSize,
-      });
-    });
+    const tilesSpec = this.mapboxRenderer
+      .getVisibleSources()
+      .reduce((a, s) => a.concat(this._getTilesSpec({ x, y, zoom }, s)), []);
 
     return new Promise((resolve, reject) => {
-      let canv = this.createTile();
+      const canv = this.createTile();
+      const ctx = canv.getContext("2d");
       const renderRef = this.mapboxRenderer.renderTiles(
-        canv.getContext("2d"),
+        ctx,
         {
           srcLeft: 0,
           srcTop: 0,
@@ -78,26 +98,22 @@ class MVTImageryProvider {
           destTop: 0,
         },
         tilesSpec,
-        (err) => {
+        async (err) => {
           if (!!err) {
             switch (err) {
-              case "canceled":
-              case "fully-canceled":
+              case "canceled": case "fully-canceled":
                 reject(undefined);
-                break;
-              default:
-                reject(undefined);
+                return;
             }
+          }
+          if (releaseTile) {
+            renderRef.consumer.ctx = undefined;
+            resolve(canv);
+            // releaseTile默认为true，对应Cesium请求图像的情形
+            this.mapboxRenderer.releaseRender(renderRef);
           } else {
-            if (releaseTile) {
-              renderRef.consumer.ctx = undefined;
-              resolve(canv);
-              // releaseTile默认为true，对应Cesium请求图像的情形
-              this.mapboxRenderer.releaseRender(renderRef);
-            } else {
-              // releaseTile为false时在由pickFeature手动调用，在渲染完成之后在pickFeature里边手动释放tile
-              resolve(renderRef);
-            }
+            // releaseTile为false时在由pickFeature手动调用，在渲染完成之后在pickFeature里边手动释放tile
+            resolve(renderRef);
           }
         }
       );
