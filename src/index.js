@@ -3,24 +3,34 @@ import * as Cesium from "cesium";
 
 class MVTImageryProvider {
   /**
-   *
-   * @param {Object} options
-   * @param {Object} options.style - mapbox style object
+   * create a MVTImageryProvider Object
+   * @param {MVTImageryProviderOptions} options MVTImageryProvider options as follow:
+   * @param {Resource | string | Object} options.style - mapbox style object or url Resource.
+   * @param {string} options.accessToken - mapbox style accessToken.
+   * @param {RequestTransformFunction} options.transformRequest - use transformRequest to modify tile requests.
    * @param {Function} [options.sourceFilter] - sourceFilter is used to filter which source participate in pickFeature process.
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
    * @param {Number} [options.tileSize=512] - can be 256 or 512.
-   * @param {WebMercatorTilingScheme | GeographicTilingScheme} [options.tilingScheme = WebMercatorTilingScheme] - Cesium tilingScheme, defaults to WebMercatorTilingScheme(EPSG: 3857).
+   * @param {Cesium.WebMercatorTilingScheme | Cesium.GeographicTilingScheme} [options.tilingScheme = Cesium.WebMercatorTilingScheme] - Cesium tilingScheme, defaults to WebMercatorTilingScheme(EPSG: 3857).
    * @param {Boolean} [options.hasAlphaChannel] -
-   * @param {String} [options.credit] -
-   *
+   * @param {Credit} options.credit - A credit contains data pertaining to how to display attributions/credits for certain content on the screen.
+   * @example
+   * const imageryProvider = new MVTImageryProvider({
+        style: 'https://demotiles.maplibre.org/style.json',
+        accessToken: MAPBOX_TOKEN,
+        transformRequest: function(url, resourceType) {
+          if (resourceType === 'Source' && url.indexOf('http://myHost') > -1) {
+            return {
+              url: url.replace('http', 'https'),
+              headers: { 'my-custom-header': true },
+              credentials: 'include'  // Include cookies for cross-origin requests
+            }
+          }
+        }
+      });
    */
   constructor(options) {
-    this.mapboxRenderer = new Mapbox.BasicRenderer({ style: options.style });
-    this.ready = false;
-    this.readyPromise = this.mapboxRenderer._style.loadedPromise.then(
-      () => (this.ready = true)
-    );
     this.tilingScheme = options.tilingScheme ? options.tilingScheme : new Cesium.WebMercatorTilingScheme();
     this.rectangle = this.tilingScheme.rectangle;
     this.tileSize = this.tileWidth = this.tileHeight = options.tileSize || 512;
@@ -33,6 +43,49 @@ class MVTImageryProvider {
     this.hasAlphaChannel =
       options.hasAlphaChannel !== undefined ? options.hasAlphaChannel : true;
     this.sourceFilter = options.sourceFilter;
+    this.ready = false;
+
+    this._accessToken = options.accessToken;
+    this.readyPromise = this._preLoad(options.style).then(style => {
+      this._style = style
+      this.mapboxRenderer = new Mapbox.BasicRenderer({
+        style,
+        token: this._accessToken,
+        transformRequest: options.transformRequest
+      })
+      return this.mapboxRenderer
+    }).then(renderObj => {
+      renderObj._style.loadedPromise.then(() => {
+        this.ready = true
+      });
+    })
+  }
+
+  _preLoad(data) {
+    let promise = data
+    if (typeof data === 'string') {
+      data = new Cesium.Resource({
+        url: data,
+        queryParameters: {
+          access_token: this._accessToken
+        }
+      })
+    }
+    if (data instanceof Cesium.Resource) {
+      const prefix = "https://api.mapbox.com/";
+      if (data.url.startsWith("mapbox://"))
+        data.url = data.url.replace("mapbox://", prefix);
+      if(this._accessToken)
+        data.appendQueryParameters({
+          access_token: this._accessToken
+        })
+      promise = data.fetchJson()
+    }
+    return Promise.resolve(promise)
+      .catch( error => {
+        this.errorEvent.raiseEvent(error);
+        throw error;
+      });
   }
 
   getTileCredits(x, y, level) {

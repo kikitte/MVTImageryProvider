@@ -23,13 +23,9 @@ provider.readyPromise.then(() => {
  * Example 2:
  */
 
-// fetch("https://api.maptiler.com/maps/basic/style.json?key=pSHUA9sSkNny3iqoWG4P")
-//   .then((res) => res.json())
-//   .then((style) => {
-//     const provider = new MVTImageryProvider({
-//       style,
-//     });
-//     provider.readyPromise.then(() => {
-//       cesiumViewer.imageryLayers.addImageryProvider(provider);
-//     });
-//   });
+/* const provider2 = new MVTImageryProvider({
+  style: 'https://demotiles.maplibre.org/style.json',
+}); 
+provider2.readyPromise.then(() => {
+  cesiumViewer.imageryLayers.addImageryProvider(provider2);
+}); */
