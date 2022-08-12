@@ -12,6 +12,7 @@ class MVTImageryProvider {
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
    * @param {Number} [options.tileSize=512] - can be 256 or 512.
+   * @param {Boolean} [options.enablePickFeatures = true] - enable pickFeatures or not, defaults to true.
    * @param {Cesium.WebMercatorTilingScheme | Cesium.GeographicTilingScheme} [options.tilingScheme = Cesium.WebMercatorTilingScheme] - Cesium tilingScheme, defaults to WebMercatorTilingScheme(EPSG: 3857).
    * @param {Boolean} [options.hasAlphaChannel] -
    * @param {Credit} options.credit - A credit contains data pertaining to how to display attributions/credits for certain content on the screen.
@@ -37,6 +38,7 @@ class MVTImageryProvider {
     this.maximumLevel = options.maximumLevel || Number.MAX_SAFE_INTEGER;
     this.minimumLevel = options.minimumLevel || 0;
     this.tileDiscardPolicy = undefined;
+    this.enablePickFeatures = options.enablePickFeatures ? options.enablePickFeatures : true
     this.errorEvent = new Cesium.Event();
     this.credit = new Cesium.Credit(options.credit || "", false);
     this.proxy = new Cesium.DefaultProxy("");
@@ -175,6 +177,8 @@ class MVTImageryProvider {
   }
 
   pickFeatures(x, y, zoom, longitude, latitude) {
+    if (!this.enablePickFeatures) return undefined
+    
     return this.requestImage(x, y, zoom, false).then((renderRef) => {
       let targetSources = this.mapboxRenderer.getVisibleSources();
       targetSources = this.sourceFilter
@@ -183,19 +187,23 @@ class MVTImageryProvider {
 
       const queryResult = [];
 
-      longitude = Cesium.Math.toDegrees(longitude);
-      latitude = Cesium.Math.toDegrees(latitude);
+      const lng = Cesium.Math.toDegrees(longitude);
+      const lat = Cesium.Math.toDegrees(latitude);
 
       targetSources.forEach((s) => {
-        queryResult.push({
-          data: this.mapboxRenderer.queryRenderedFeatures({
-            source: s,
-            renderedZoom: zoom,
-            lng: longitude,
-            lat: latitude,
-            tileZ: zoom,
-          }),
-        });
+        const featureInfo = new Cesium.ImageryLayerFeatureInfo()
+        featureInfo.data = this.mapboxRenderer.queryRenderedFeatures({
+          source: s,
+          renderedZoom: zoom,
+          lng,
+          lat,
+          tileZ: zoom,
+        })
+        const name = Object.keys(featureInfo.data)[0]
+        featureInfo.name = name
+        const properties = featureInfo.data[name]
+        featureInfo.configureDescriptionFromProperties(properties.length === 1 ? properties[0] : properties)
+        queryResult.push(featureInfo);
       });
 
       // release tile
