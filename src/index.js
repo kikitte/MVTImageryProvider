@@ -10,6 +10,7 @@ class MVTImageryProvider {
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
    * @param {Number} [options.tileSize=512] - can be 256 or 512.
+   * @param {WebMercatorTilingScheme | GeographicTilingScheme} [options.tilingScheme = WebMercatorTilingScheme] - Cesium tilingScheme, defaults to WebMercatorTilingScheme(EPSG: 3857).
    * @param {Boolean} [options.hasAlphaChannel] -
    * @param {String} [options.credit] -
    *
@@ -20,7 +21,7 @@ class MVTImageryProvider {
     this.readyPromise = this.mapboxRenderer._style.loadedPromise.then(
       () => (this.ready = true)
     );
-    this.tilingScheme = new Cesium.WebMercatorTilingScheme();
+    this.tilingScheme = options.tilingScheme ? options.tilingScheme : new Cesium.WebMercatorTilingScheme();
     this.rectangle = this.tilingScheme.rectangle;
     this.tileSize = this.tileWidth = this.tileHeight = options.tileSize || 512;
     this.maximumLevel = options.maximumLevel || Number.MAX_SAFE_INTEGER;
@@ -52,17 +53,17 @@ class MVTImageryProvider {
     const TILE_SIZE = this.tileSize
     // 3x3 grid of source tiles, where the region of interest is that corresponding to the central source tile
     let ret = [];
-    const maxTile = (1 << zoom) - 1
+    const maxX = this.tilingScheme.getNumberOfXTilesAtLevel(zoom) - 1
+    const maxY = this.tilingScheme.getNumberOfYTilesAtLevel(zoom) - 1
     for (let xx = -1; xx <= 1; xx++) {
       let newx = x + xx
-      if (newx < 0) newx = maxTile
-      if (newx > maxTile) newx = 0
+      if (newx < 0) newx = maxX
+      if (newx > maxX) newx = 0
       for (let yy = -1; yy <= 1; yy++) {
         let newy = y + yy
-        if (newy < 0) continue
-        if (newy > maxTile) continue
+        if (newy < 0 || newy > maxY) continue
         ret.push({
-          source: source,
+          source,
           z: zoom,
           x: newx,
           y: newy,
@@ -72,7 +73,7 @@ class MVTImageryProvider {
         });
       }
     }
-    return ret
+    return ret;
   }
 
   requestImage(x, y, zoom, releaseTile = true) {
@@ -82,11 +83,11 @@ class MVTImageryProvider {
     this.mapboxRenderer.filterForZoom(zoom);
     const tilesSpec = this.mapboxRenderer
       .getVisibleSources()
-      .reduce((a, s) => a.concat(this._getTilesSpec({ x, y, zoom }, s)), []);
+      .reduce((a, s) => a.concat(this._getTilesSpec({ x, y, zoom }, s)), [])
 
     return new Promise((resolve, reject) => {
       const canv = this.createTile();
-      const ctx = canv.getContext("2d");
+      const ctx = canv.getContext("2d")
       const renderRef = this.mapboxRenderer.renderTiles(
         ctx,
         {
@@ -98,14 +99,15 @@ class MVTImageryProvider {
           destTop: 0,
         },
         tilesSpec,
-        (err) => {
-          /**
-           * In case of err ends with 'tiles not available', the canvas will still be painted.
-           * relate url: https://github.com/landtechnologies/Mapbox-vector-tiles-basic-js-renderer/blob/master/src/basic/renderer.js#L341-L405
-           */
-          if (typeof err === 'string' && !err.endsWith('tiles not available')) {
-            reject(undefined);
-          } else if (releaseTile) {
+        async (err) => {
+          if (!!err) {
+            switch (err) {
+              case "canceled": case "fully-canceled":
+                reject(undefined);
+                return;
+            }
+          }
+          if (releaseTile) {
             renderRef.consumer.ctx = undefined;
             resolve(canv);
             // releaseTile默认为true，对应Cesium请求图像的情形
