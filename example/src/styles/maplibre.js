@@ -1,4 +1,4 @@
-export const exampleStyle = {
+export default {
     "id": "43f36e14-e3f5-43c1-84c0-50a9c80dc5c7",
     "name": "MapLibre",
     "zoom": 0.8619833357855968,

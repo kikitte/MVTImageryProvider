@@ -1,7 +1,8 @@
 import * as Cesium from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import MVTImageryProvider from "cesium-mvtimageryprovider";
-import { exampleStyle } from "./example-style";
+import maplibreStyle from "./styles/maplibre";
+import mapboxBasicV8Style from './styles/mapbox-basic-v8'
 
 Cesium.Ion.defaultServer = "";
 const cesiumViewer = new Cesium.Viewer("cesiumContainer", {
@@ -10,17 +11,17 @@ const cesiumViewer = new Cesium.Viewer("cesiumContainer", {
 });
 
 /**
- * Example 1:
+ * Example 1: use existing style object
  */
 const provider = new MVTImageryProvider({
-  style: exampleStyle,
+  style: maplibreStyle,
 });
 provider.readyPromise.then(() => {
   cesiumViewer.imageryLayers.addImageryProvider(provider);
 });
 
 /**
- * Example 2:
+ * Example 2: fetch online style object from the Internet
  */
 
 // fetch("https://api.maptiler.com/maps/basic/style.json?key=pSHUA9sSkNny3iqoWG4P")
@@ -33,3 +34,14 @@ provider.readyPromise.then(() => {
 //       cesiumViewer.imageryLayers.addImageryProvider(provider);
 //     });
 //   });
+
+/**
+ * Example 3: use mapbox official style with access token
+ */
+// const provider = new MVTImageryProvider({
+//   style: mapboxBasicV8Style,
+//   mapboxAccessToken: 'pk.eyJ1Ijoia2lraXR0ZWxlZSIsImEiOiJja254eDZ5MGUwdmZvMndveTM2ZGlxY202In0.QTDE0VZFKtcWic6eY1q_jA'
+// });
+// provider.readyPromise.then(() => {
+//   cesiumViewer.imageryLayers.addImageryProvider(provider);
+// });
