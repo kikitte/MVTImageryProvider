@@ -1,6 +1,15 @@
 import Mapbox from "./mapbox-gl";
 import * as Cesium from "cesium";
 
+/**
+ * @typedef {'Unknown' | 'Style' | 'Source' | 'Tile' | 'Glyphs' | 'SpriteImage' | 'SpriteJSON' | 'Image'} ResourceType
+ * @typedef {Object} RequestParameters
+ * @property {string} url The URL to be requested.
+ * @property {Object} headers The headers to be sent with the request.
+ * @property {string} credentials `'same-origin'|'include'` Use 'include' to send cookies with cross-origin requests.
+ * @typedef {(url: String, resourceType: ResourceType) => RequestParameters} RequestTransformFunction
+ */
+
 class MVTImageryProvider {
   /**
    *
@@ -10,6 +19,7 @@ class MVTImageryProvider {
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
    * @param {String} [options.enablePickFeatures=true] - enable pickFeatures or not
+   * @param {RequestTransformFunction} [options.requestTransformFn] - intercepts vector tile request and implements custom modification for the request
    * @param {String} [options.mapboxAccessToken] - sets the map's access token(https://www.mapbox.com/help/define-access-token/) for the mapbox resources
    * @param {Number} [options.tileSize=512] - can be 256 or 512.
    * @param {Boolean} [options.hasAlphaChannel] -
@@ -17,7 +27,7 @@ class MVTImageryProvider {
    *
    */
   constructor(options) {
-    this.mapboxRenderer = new Mapbox.BasicRenderer({ style: options.style });
+    this.mapboxRenderer = new Mapbox.BasicRenderer({ style: options.style, requestTransformFn: options.requestTransformFn });
     this.ready = false;
     this.readyPromise = this.mapboxRenderer._style.loadedPromise.then(
       () => (this.ready = true)
