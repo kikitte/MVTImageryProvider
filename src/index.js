@@ -9,6 +9,7 @@ class MVTImageryProvider {
    * @param {Function} [options.sourceFilter] - sourceFilter is used to filter which source participate in pickFeature process.
    * @param {Number} [options.maximumLevel] - if cesium zoom level exceeds maximumLevel, layer will be invisible.
    * @param {Number} [options.minimumLevel] - if cesium zoom level belows minimumLevel, layer will be invisible.
+   * @param {String} [options.enablePickFeatures=true] - enable pickFeatures or not
    * @param {String} [options.mapboxAccessToken] - sets the map's access token(https://www.mapbox.com/help/define-access-token/) for the mapbox resources
    * @param {Number} [options.tileSize=512] - can be 256 or 512.
    * @param {Boolean} [options.hasAlphaChannel] -
@@ -36,6 +37,7 @@ class MVTImageryProvider {
     if (options.mapboxAccessToken) {
       Mapbox.accessToken = options.mapboxAccessToken
     }
+    this.enablePickFeatures = 'enablePickFeatures' in options ? !!options.enablePickFeatures : true
   }
 
   getTileCredits(x, y, level) {
@@ -124,6 +126,8 @@ class MVTImageryProvider {
   }
 
   pickFeatures(x, y, zoom, longitude, latitude) {
+    if (!this.ready || !this.enablePickFeatures) return undefined
+
     return this.requestImage(x, y, zoom, false).then((renderRef) => {
       let targetSources = this.mapboxRenderer.getVisibleSources();
       targetSources = this.sourceFilter
