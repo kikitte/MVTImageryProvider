@@ -9,7 +9,12 @@ Clone the project and then place the file in src to appropriate folder.
 1. construct ImageryProvider instance
    ```javascript
    let options = {
-     style: Object // Mapbox Style Object, required.
+     // Required. Mapbox Style Object.
+     style: Object,
+     // Optional, may be undefined or unset. intercepts tile request, so you can make some modifications to the request, for example adding custom header
+     requestTransformFn: (url) => {
+      return {url: url, headers: {'myheader': 'header-content'}, credentials: ''}
+     }
    }
    let provider = new ImageryProvider(options)
    ```

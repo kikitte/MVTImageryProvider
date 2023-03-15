@@ -15,6 +15,10 @@ const cesiumViewer = new Cesium.Viewer("cesiumContainer", {
  */
 const provider = new MVTImageryProvider({
   style: maplibreStyle,
+  requestTransformFn: (url) => {
+    console.log('request tile at: ' + url);
+    return {url: url, headers: {'Accept-Language': 'zh-cn'}, credentials: ''};
+  }
 });
 provider.readyPromise.then(() => {
   cesiumViewer.imageryLayers.addImageryProvider(provider);

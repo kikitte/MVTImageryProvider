@@ -7,7 +7,11 @@
 1. 构建ImageryProvider
    ```javascript
    let options = {
-     style: Object // 样式对象，必选．
+     // 必选，样式对象.
+     style: Object,
+     // 可选，可不设置或设置为undefined。用于拦截瓦片请求，可用于自定义请求，比如说修改url或者新增header
+     requestTransformFn: (url) => {
+      return {url: url, headers: {'myheader': 'header-content'}, credentials: ''}
    }
    let provider = new ImageryProvider(options)
    ```
